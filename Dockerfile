@@ -13,7 +13,7 @@ RUN echo 'cat //html/body/div[2]/div/div[2]/div[2]/div/div[3]/div/div[1]/div/div
 ## Delete Download Page
 RUN rm fucitrix.html
 
-FROM firefox
+FROM quay.io/rh_ee_bgrossew/firefox:latest
 
 #Install Dependencies
 RUN dnf install -y \
@@ -39,16 +39,19 @@ COPY --from=citrix citrix.rpm /tmp/packages/citrix.rpm
 RUN rpm -i /tmp/packages/citrix.rpm
 
 # Install Certificates into Citrix Workspace
-RUN cp /mnt/certs/* /opt/Citrix/ICAClient/keystore/cacerts/
-
-RUN /opt/Citrix/ICAClient/util/ctx_rehash
+RUN \
+    if [ -d /mnt/certs ]; then \
+        cp /mnt/certs/* /opt/Citrix/ICAClient/keystore/cacerts/
+        /opt/Citrix/ICAClient/util/ctx_rehash
+    fi
 
 # Install Certificates for System
-RUN cp /mnt/trustanchors/* /tmp/trust/
-
-RUN cp /tmp/trust/* /etc/pki/ca-trust/source/anchors/
-
-RUN update-ca-trust
+RUN \
+    if [ -d /mnt/trustanchors ]; then \
+        cp -r /mnt/trustanchors /tmp/trust \
+        cp /tmp/trust/* /etc/pki/ca-trust/source/anchors/ \
+        update-ca-trust; \
+    fi
 
 # Create Firefox Policy
 ARG HOMEPAGES=https://www.redhat.com
@@ -79,9 +82,11 @@ RUN \
     echo -e '        "Certificates": {'                                      >> $POLICY && \
     echo -e '            "Install": ['                                       >> $POLICY && \
 
-    ind=$(printf ' %.0s' {1..16}) \
-    CERTS=$(for f in /tmp/trust/*; do echo "$ind\"$f\","; done) && \
-    (IFS=$"\n"; echo -e ${CERTS:0:${#CERTS}-1})                              >> $POLICY && \
+    if [ -d /tmp/trust ]; then  \
+        ind=$(printf ' %.0s' {1..16}) \
+        CERTS=$(for f in /tmp/trust/*; do echo "$ind\"$f\","; done) && \
+        (IFS=$"\n"; echo -e ${CERTS:0:${#CERTS}-1})                          >> $POLICY; \
+    fi && \
 
     echo -e '            ]'                                                  >> $POLICY && \
     echo -e '        }'                                                      >> $POLICY && \
@@ -92,10 +97,12 @@ RUN \
 COPY entrypoint.sh /tmp/entrypoint.sh
 ENTRYPOINT ["/tmp/entrypoint.sh"]
 
-#Example 'podman run' Command
-#  podman run -it --rm -v $XAUTHORITY:$XAUTHORITY:ro -v /tmp/.X11-unix:/tmp/.X11-unix:ro --userns keep-id --workdir=/tmp -e "DISPLAY" --network=debeka --ip 10.89.0.3 --dns 10.89.0.2 --ipc=host --cap-add=NET_ADMIN --security-opt label=type:container_runtime_t citrix
+#Example 'podman build' Command
+#podman build . -t citrix  -v ~/certs:/mnt/certs:ro,z -v ~/trustanchors:/mnt/trustanchors:ro,z --build-arg HOMEPAGES="https://www.redhat.com https://www.google.com"
 
-#podman build . -t citrix  -v /home/bgrossew/devel/git/debeka_citrix/citrix/certs:/mnt/certs:ro,z -v /home/bgrossew/devel/git/debeka_citrix/citrix/trustanchors:/mnt/trustanchors:ro,z --build-arg HOMEPAGES="https://fw.debeka.de/connect/PortalMain https://vdi.debeka.de"
+#Example 'podman run' Command
+#  podman run -it --rm -v $XAUTHORITY:$XAUTHORITY:ro -v /tmp/.X11-unix:/tmp/.X11-unix:ro --userns keep-id --workdir=/tmp -e "DISPLAY" --network=host --ip 10.89.0.3 --dns 10.89.0.2 --ipc=host --cap-add=NET_ADMIN --security-opt label=type:container_runtime_t citrix
+
 
 
 
