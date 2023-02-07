@@ -25,6 +25,7 @@ RUN dnf install -y \
     libXpm \
     libICE \
     webkit2gtk4.0 \
+    speexdsp \
 # Routing
     iproute \
     net-tools 
