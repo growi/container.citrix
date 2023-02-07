@@ -5,7 +5,8 @@ RUN dnf install -y wget libxml2 unzip
 
 # Downlaod Citrix RPM Package
 ## Get Download Page
-RUN wget https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html -O fucitrix.html 
+#RUN wget https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html -O fucitrix.html 
+RUN wget https://www.citrix.com/downloads/workspace-app/legacy-workspace-app-for-linux/workspace-app-for-linux-latest4.html -O fucitrix.html
 
 ## Extract authorized Download URL for latest Package
 RUN echo 'cat //html/body/div[2]/div/div[2]/div[2]/div/div[3]/div/div[1]/div/div[4]/div/div/div[3]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[1]/div/div/div/div/a/@rel' | xmllint --html --shell fucitrix.html 2>/dev/null | grep rel | cut -d\" -f2 | sed -e 's/^/https:/' | xargs wget -O citrix.rpm 
@@ -45,10 +46,10 @@ RUN \
         /opt/Citrix/ICAClient/util/ctx_rehash
 
 # Install Certificates for System
-RUN \
-        cp -r /mnt/trustanchors /tmp/trust && \
-        cp /tmp/trust/* /etc/pki/ca-trust/source/anchors/ && \
-        update-ca-trust 
+RUN mkdir -p /tmp/trust && \
+    cp /mnt/trustanchors/* /tmp/trust/ && \
+    cp /tmp/trust/* /etc/pki/ca-trust/source/anchors/ && \
+    update-ca-trust 
 
 # Create Firefox Policy
 ARG HOMEPAGES=https://www.redhat.com
