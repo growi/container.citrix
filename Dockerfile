@@ -41,18 +41,14 @@ RUN rpm -i /tmp/packages/citrix.rpm
 
 # Install Certificates into Citrix Workspace
 RUN \
-    if [ -d /mnt/certs ]; then \
-        cp /mnt/certs/* /opt/Citrix/ICAClient/keystore/cacerts/
+        cp /mnt/certs/* /opt/Citrix/ICAClient/keystore/cacerts/ && \
         /opt/Citrix/ICAClient/util/ctx_rehash
-    fi
 
 # Install Certificates for System
 RUN \
-    if [ -d /mnt/trustanchors ]; then \
-        cp -r /mnt/trustanchors /tmp/trust \
-        cp /tmp/trust/* /etc/pki/ca-trust/source/anchors/ \
-        update-ca-trust; \
-    fi
+        cp -r /mnt/trustanchors /tmp/trust && \
+        cp -r  /tmp/trust/* /etc/pki/ca-trust/source/anchors/ && \
+        update-ca-trust 
 
 # Create Firefox Policy
 ARG HOMEPAGES=https://www.redhat.com
