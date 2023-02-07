@@ -47,7 +47,7 @@ RUN \
 # Install Certificates for System
 RUN \
         cp -r /mnt/trustanchors /tmp/trust && \
-        cp -r  /tmp/trust/* /etc/pki/ca-trust/source/anchors/ && \
+        cp /tmp/trust/* /etc/pki/ca-trust/source/anchors/ && \
         update-ca-trust 
 
 # Create Firefox Policy
