@@ -5,8 +5,7 @@ RUN dnf install -y wget libxml2 unzip
 
 # Downlaod Citrix RPM Package
 ## Get Download Page
-#RUN wget https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html -O fucitrix.html 
-RUN wget https://www.citrix.com/downloads/workspace-app/legacy-workspace-app-for-linux/workspace-app-for-linux-latest4.html -O fucitrix.html
+RUN wget https://www.citrix.com/downloads/workspace-app/linux/workspace-app-for-linux-latest.html -O fucitrix.html 
 
 ## Extract authorized Download URL for latest Package
 RUN echo 'cat //html/body/div[2]/div/div[2]/div[2]/div/div[3]/div/div[1]/div/div[4]/div/div/div[3]/div[2]/div/div/div/div/div/div[2]/div[2]/div/div/div[1]/div/div/div/div/a/@rel' | xmllint --html --shell fucitrix.html 2>/dev/null | grep rel | cut -d\" -f2 | sed -e 's/^/https:/' | xargs wget -O citrix.rpm 
@@ -18,18 +17,38 @@ FROM quay.io/rh_ee_bgrossew/firefox:latest
 
 #Install Dependencies
 RUN dnf install -y \
-# ICAClient dependencies
+# ICiAClient dependencies
+    libstdc++ \ 
+    glibc \
     gtk2 \
+    libcap \
+    json-c \ 
+    alsa-lib \
+    webkit2gtk4.0 \
+    libxml2 \
+    xerces-c \
+    speexdsp \
+    libvorbis \
+    chkconfig \
+    zlib \
+    libtar \
     libXt \
     libXmu \
-    libSM \
     libXpm \
-    libICE \
-    webkit2gtk4.0 \
-    speexdsp \
+    xdpyinfo \
+    xprop \
+    pcsc-lite \
+    libXScrnSaver \
+    gtkglext-libs \
+    libunwind \
+    cups \
+    gstreamer1-plugins-{bad-\*,good-\*,base} \
+    gstreamer1-plugin-openh264 \
+    gstreamer1-libav \
 # Routing
     iproute \
-    net-tools 
+    net-tools \ 
+    --exclude=gstreamer1-plugins-bad-free-devel
 
 # Install Ctrix Workspace
 RUN mkdir -p /tmp/packages
