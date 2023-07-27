@@ -14,7 +14,8 @@ RUN echo 'cat //html/body/div[2]/div/div[1]/div[2]/div/div[3]/div/div[1]/div/div
 ## Delete Download Page
 RUN rm fucitrix.html
 
-FROM quay.io/rh_ee_bgrossew/firefox:latest
+#FROM quay.io/rh_ee_bgrossew/firefox:latest
+FROM quay.io/rh_ee_bgrossew/firefox@sha256:5c72471e342d09b01501de45148f7cc93d44a10da147f086b7d7323e7a8747a4
 
 #Install Dependencies
 RUN dnf install -y \
@@ -49,6 +50,9 @@ RUN dnf install -y \
 # Routing
     iproute \
     net-tools \ 
+# Additional
+   jq \
+   moreutils \
     --exclude=gstreamer1-plugins-bad-free-devel
 
 # Install Ctrix Workspace
@@ -59,6 +63,9 @@ COPY --from=citrix citrix.rpm /tmp/packages/citrix.rpm
 
 # Install Citrix Workspace
 RUN dnf localinstall /tmp/packages/citrix.rpm -y
+
+COPY All_Regions.ini /opt/Citrix/ICAClient/config/All_Regions.ini
+RUN chmod 666 /opt/Citrix/ICAClient/config/All_Regions.ini
 
 # Install Certificates into Citrix Workspace
 RUN \
@@ -110,6 +117,8 @@ RUN \
     echo -e '        }'                                                      >> $POLICY && \
     echo -e '    }'                                                          >> $POLICY && \
     echo -e '}'                                                              >> $POLICY
+
+RUN chmod 666 $POLICY
 
 #Configure Entrypoint 
 COPY entrypoint.sh /tmp/entrypoint.sh
