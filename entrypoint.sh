@@ -32,6 +32,11 @@ if [ ! -z "$http_proxy" ] || [ ! -z "$https_proxy" ]; then
     sed 's/${ProxyType}/Secure/g' $citrixAllRegions | sponge $citrixAllRegions
     sed 's/${ProxyHost}/'$proxySSLHostDNS'/g' $citrixAllRegions | sponge $citrixAllRegions
     sed 's/${ProxyPort}/'$proxySSLHostPort'/g' $citrixAllRegions | sponge $citrixAllRegions
+  else
+    sed 's/${HDXoverUDP}//g' $citrixAllRegions | sponge $citrixAllRegions
+    sed 's/${ProxyType}//g' $citrixAllRegions | sponge $citrixAllRegions
+    sed 's/${ProxyHost}//g' $citrixAllRegions | sponge $citrixAllRegions
+    sed 's/${ProxyPort}//g' $citrixAllRegions | sponge $citrixAllRegions
   fi
 
   policies=$(jq --argjson jq_proxy "$proxyBase" '.policies + {"Proxy": $jq_proxy}' /usr/lib64/firefox/distribution/policies.json)
