@@ -5,8 +5,8 @@ if [ ! -z "$GATEWAY_ADDRESS" ]; then
     ip r a default via $GATEWAY_ADDRESS
 fi
 
-mkdir -p /tmp/.ICAClient
-touch /tmp/.ICAClient/.eula_accepted
+mkdir -p /var/log/citrix/.ICAClient
+touch /var/log/citrix/.ICAClient/.eula_accepted
 
 if [ ! -z "$http_proxy" ] || [ ! -z "$https_proxy" ]; then
   proxyBase='{"Mode":"manual","Locked":true,"UseHTTPProxyForAllProtocols":false,"UseProxyForDNS":false}'
