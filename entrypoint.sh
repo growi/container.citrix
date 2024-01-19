@@ -45,4 +45,17 @@ fi
 
 firefox --new-instance
 
-      
+echo "Firefox closed"
+
+# Check if wfica is (still) running, exit otherwise
+while true;
+do
+  sleep 1
+  PROC_COUNT=$(ps -o command --no-headers --ppid 1|grep wfica|wc -l)
+  if [ "$PROC_COUNT" -eq "0" ]; then
+    echo "Citrix client wfica not found"
+    break
+  fi
+done
+
+echo "Exiting..."
