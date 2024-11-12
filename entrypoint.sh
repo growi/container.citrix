@@ -5,9 +5,6 @@ if [ ! -z "$GATEWAY_ADDRESS" ]; then
     ip r a default via $GATEWAY_ADDRESS
 fi
 
-mkdir -p /var/log/citrix/.ICAClient
-touch /var/log/citrix/.ICAClient/.eula_accepted
-
 if [ ! -z "$http_proxy" ] || [ ! -z "$https_proxy" ]; then
   proxyBase='{"Mode":"manual","Locked":true,"UseHTTPProxyForAllProtocols":false,"UseProxyForDNS":false}'
   proxyHttp='{"HTTPProxy": "hostname"}'
@@ -42,6 +39,9 @@ if [ ! -z "$http_proxy" ] || [ ! -z "$https_proxy" ]; then
   policies=$(jq --argjson jq_proxy "$proxyBase" '.policies + {"Proxy": $jq_proxy}' /usr/lib64/firefox/distribution/policies.json)
   jq --argjson jq_policies "$policies" '.policies = $jq_policies' /usr/lib64/firefox/distribution/policies.json | sponge /usr/lib64/firefox/distribution/policies.json 
 fi 
+
+mkdir -p /tmp/.ICAClient
+touch /tmp/.ICAClient/.eula_accepted
 
 firefox --new-instance
 
