@@ -53,6 +53,7 @@ RUN dnf install -y \
 # Additional
    jq \
    moreutils \
+   envsubst \
     --exclude=gstreamer1-plugins-bad-free-devel
 
 # Install Ctrix Workspace
@@ -129,8 +130,3 @@ ENTRYPOINT ["/tmp/entrypoint.sh"]
 
 #Example 'podman run' Command
 #  podman run -it --rm -v $XAUTHORITY:$XAUTHORITY:ro -v /tmp/.X11-unix:/tmp/.X11-unix:ro --userns keep-id --workdir=/tmp -e "DISPLAY" --network=host --ip 10.89.0.3 --dns 10.89.0.2 --ipc=host --cap-add=NET_ADMIN --security-opt label=type:container_runtime_t citrix
-
-
-
-
-

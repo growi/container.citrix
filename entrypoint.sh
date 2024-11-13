@@ -43,7 +43,16 @@ fi
 mkdir -p /tmp/.ICAClient
 touch /tmp/.ICAClient/.eula_accepted
 
-firefox --new-instance
+mkdir -p /tmp/firefox/profile
+
+if [ ! -z "$FIREFOX_PROFILE" ]; then
+  if [ ! -d "/tmp/firefox/profile/$FIREFOX_PROFILE" ]; then
+    firefox -CreateProfile "$FIREFOX_PROFILE /tmp/firefox/profile/$FIREFOX_PROFILE"
+  fi
+  firefox --new-instance -profile "/tmp/firefox/profile/$FIREFOX_PROFILE"
+else
+  firefox --new-instance
+fi
 
 echo "Firefox closed"
 
